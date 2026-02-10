@@ -198,14 +198,14 @@ const metroLines = [
       "淡江大學",
       "淡金北新",
       "新市一路",
-      "淡海新市鎮",
-      "崁頂",
-      "沙崙",
-      "台北海洋大學",
       "淡水行政中心",
       "濱海義山",
       "濱海沙崙",
-      "崁頂站 (綠山線支線示意)"
+      "淡海新市鎮",
+      "崁頂",
+      "淡水漁人碼頭",
+      "沙崙",
+      "台北海洋大學"
     ]
   },
   {
@@ -215,13 +215,44 @@ const metroLines = [
     color: "#14b8a6",
     accent: "#a5f3fc",
     stations: [
-      "十四張",
-      "秀朗橋",
-      "景文科大",
+      "雙城",
+      "玫瑰中國城",
+      "台北小城",
       "耕莘安康院區",
-      "臺北小城",
+      "景文科大",
+      "安康",
       "陽光運動公園",
-      "安康"
+      "新和國小",
+      "十四張"
+    ]
+  },
+  {
+    id: "A",
+    name: "機場捷運",
+    provider: "桃園捷運",
+    color: "#6366f1",
+    accent: "#c7d2fe",
+    stations: [
+      "台北車站",
+      "三重",
+      "新北產業園區",
+      "泰山",
+      "泰山貴和",
+      "體育大學",
+      "長庚醫院",
+      "林口",
+      "山鼻",
+      "坑口",
+      "大園",
+      "機場旅館",
+      "機場第一航廈",
+      "機場第二航廈",
+      "高鐵桃園",
+      "桃園體育園區",
+      "興南",
+      "環北",
+      "領航",
+      "老街溪"
     ]
   }
 ];
@@ -246,6 +277,11 @@ if (yearEl) {
 
 let isSpinning = false;
 let currentRotation = 0;
+const removedStations = new Set();
+
+function makeStationKey(lineId, stationName) {
+  return `${lineId}::${stationName}`;
+}
 
 function getActiveStations() {
   const checkboxes = lineFiltersEl.querySelectorAll(
@@ -262,14 +298,18 @@ function getActiveStations() {
   const stations = [];
   activeLines.forEach((line) => {
     line.stations.forEach((name) => {
-      stations.push({
-        lineId: line.id,
-        lineName: line.name,
-        lineColor: line.color,
-        segmentColor: line.accent || line.color,
-        stationName: name,
-        provider: line.provider
-      });
+      const key = makeStationKey(line.id, name);
+      if (!removedStations.has(key)) {
+        stations.push({
+          key,
+          lineId: line.id,
+          lineName: line.name,
+          lineColor: line.color,
+          segmentColor: line.accent || line.color,
+          stationName: name,
+          provider: line.provider
+        });
+      }
     });
   });
 
@@ -380,7 +420,7 @@ function spinWheel() {
 
   const stations = getActiveStations();
   if (!stations.length) {
-    statusEl.textContent = "請先勾選至少一條捷運線";
+    statusEl.textContent = "目前沒有可抽的站，請重置或變更路線";
     statusEl.classList.remove("info-value-muted");
     statusEl.classList.remove("info-value-accent");
     return;
@@ -430,6 +470,23 @@ function spinWheel() {
     statusEl.classList.remove("info-value-muted");
     statusEl.classList.add("info-value-accent");
 
+    // 把抽到的站點從之後的抽選池中剔除
+    if (chosen.key) {
+      removedStations.add(chosen.key);
+    } else {
+      removedStations.add(makeStationKey(chosen.lineId, chosen.stationName));
+    }
+
+    const remaining = getActiveStations();
+    buildWheelGradient(remaining);
+    const hasAnyRemaining = remaining.length > 0;
+    spinButton.disabled = !hasAnyRemaining;
+    if (!hasAnyRemaining) {
+      statusEl.textContent = "所有站都已抽完，可以重置或調整路線";
+      statusEl.classList.remove("info-value-accent");
+      statusEl.classList.add("info-value-muted");
+    }
+
     if (wheelEl) {
       wheelEl.classList.remove("wheel--spinning");
     }
@@ -456,6 +513,12 @@ function resetWheel() {
   statusEl.textContent = "待開始";
   statusEl.classList.remove("info-value-accent");
   statusEl.classList.add("info-value-muted");
+
+  // 重置已抽過的站點，恢復完整抽選列表
+  removedStations.clear();
+  const stations = getActiveStations();
+  buildWheelGradient(stations);
+  spinButton.disabled = !stations.length;
 }
 
 function toggleAllLines() {
