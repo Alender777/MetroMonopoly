@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+  <head>
+    <meta charset="UTF-8" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1, viewport-fit=cover"
+    />
+    <title>轉盤抽獎｜MetroMonopoly</title>
+    <meta
+      name="description"
+      content="現代簡約風格的轉盤抽獎網站，支援手機與電腦的響應式設計。"
+    />
+    <link rel="stylesheet" href="style.css" />
+  </head>
+  <body>
+    <div class="page">
+      <header class="header">
+        <div class="brand">
+          <span class="brand-mark"></span>
+          <span class="brand-text">MetroMonopoly</span>
+        </div>
+        <div class="header-meta">
+          <span class="header-tag">Lucky Wheel</span>
+        </div>
+      </header>
+
+      <main class="main">
+        <section class="card">
+          <div class="card-left">
+            <h1 class="title">捷運大富翁轉盤</h1>
+            <p class="subtitle">
+              從 <strong>台北捷運</strong> 與 <strong>新北捷運</strong> 目前通車路線中，
+              隨機抽出一個站。
+            </p>
+
+            <section class="filters" aria-labelledby="filters-title">
+              <div class="filters-header">
+                <h2 id="filters-title" class="filters-title">選擇要包含的路線</h2>
+                <button id="toggleAllLines" class="filters-toggle" type="button">
+                  全選
+                </button>
+              </div>
+              <p class="filters-desc">
+                勾選要參加抽選的捷運線，轉盤會從這些路線的所有車站中隨機選一站。
+              </p>
+              <div id="lineFilters" class="filters-grid">
+                <!-- 由 JS 動態產生各捷運線 checkbox -->
+              </div>
+            </section>
+
+            <div class="info">
+              <div class="info-row">
+                <span class="info-label">目前結果</span>
+                <span id="result" class="info-value">尚未抽獎</span>
+              </div>
+              <div class="info-row">
+                <span class="info-label">狀態</span>
+                <span id="status" class="info-value info-value-muted"
+                  >待開始</span
+                >
+              </div>
+            </div>
+
+            <div class="controls">
+              <button id="spinButton" class="btn-primary">開始抽獎</button>
+              <button id="resetButton" class="btn-ghost">重置結果</button>
+            </div>
+
+            <p class="hint">
+              可以在 <code>script.js</code> 中調整獎項內容與機率，部署到
+              GitHub Pages 或任何靜態空間即可使用。
+            </p>
+          </div>
+
+          <div class="card-right">
+            <div class="wheel-wrapper">
+              <div class="wheel-shadow"></div>
+              <div id="wheel" class="wheel">
+                <!-- 由 CSS conic-gradient + JS 控制旋轉 -->
+              </div>
+              <div class="wheel-center"></div>
+              <div class="wheel-indicator"></div>
+            </div>
+          </div>
+        </section>
+      </main>
+
+      <div
+        id="resultDialog"
+        class="dialog-overlay"
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="resultDialogTitle"
+        aria-hidden="true"
+      >
+        <div class="dialog">
+          <div id="resultDialogTitle" class="dialog-header">抽獎結果</div>
+          <div class="dialog-body">
+            <p class="dialog-label">你這一站是</p>
+            <p id="dialogResultText" class="dialog-result"></p>
+            <p id="dialogSubText" class="dialog-sub"></p>
+          </div>
+          <button
+            id="dialogCloseButton"
+            class="btn-primary dialog-close"
+            type="button"
+          >
+            好的，出發！
+          </button>
+        </div>
+      </div>
+
+      <footer class="footer">
+        <span>© <span id="year"></span> MetroMonopoly. All rights reserved.</span>
+      </footer>
+    </div>
+
+    <script src="script.js"></script>
+  </body>
+</html>
+
+
